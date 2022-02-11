@@ -15,7 +15,6 @@ theme the project is using to the project.
 """
 
 import sys, os
-import sphinx_bootstrap_theme
 
 """
 Adds path to the folder ext, where extensions are stored.
