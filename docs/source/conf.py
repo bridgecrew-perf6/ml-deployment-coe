@@ -9,6 +9,22 @@ author = 'Blned360.LLC'
 release = '0.0'
 version = '0.0.0'
 
+"""
+Imports the system and the 
+theme the project is using to the project.
+"""
+
+import sys, os
+import sphinx_bootstrap_theme
+
+"""
+Adds path to the folder ext, where extensions are stored.
+"""
+
+sys.path.append(os.path.abspath('ext'))
+sys.path.append('.')
+
+
 # -- General configuration
 
 extensions = [
