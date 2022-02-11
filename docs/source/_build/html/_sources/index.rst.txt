@@ -12,23 +12,23 @@ Introduction
 
 
 - Jeff Chen, jeff.chen@blend360.com
-.. figure:: /images/Jeff.jpg
+.. image:: images/Jeff.jpg
    :height: 180px
 
 - Yue Long, yue.long@blend360.com
-.. figure:: /images/Yue.jpg
+.. image:: images/Yue.jpg
    :height: 180px
 
 - Raj Desai, raj.desai@blend360.com
-.. figure:: /images/Raj.jpg
+.. image:: images/Raj.jpg
    :height: 180px
    
 - Zihao Yan, zihao.yan@blend360.com
-.. figure:: /images/Zihao.jpg
+.. image:: images/Zihao.jpg
    :height: 180px
 
 - Thomas O'Neil, thomasgoneill@blend360.com
-.. figure:: /images/Thomas.jpg
+.. image:: images/Thomas.jpg
    :height: 180px
 
 Plan
