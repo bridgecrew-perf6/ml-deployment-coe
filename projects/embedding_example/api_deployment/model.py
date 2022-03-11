@@ -5,9 +5,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 
 # read datasets
-df_sample_customer = pd.read_csv('/content/drive/MyDrive/Datasets/Blend360/data/sample_customer.csv')
-df_sample_product = pd.read_csv('/content/drive/MyDrive/Datasets/Blend360/data/sample_product.csv')
-df_sample_tlog = pd.read_csv('/content/drive/MyDrive/Datasets/Blend360/data/sample_tlog.csv')
+df_sample_customer = pd.read_csv(r'C:\Users\ZihaoYan\Downloads\API_Deploy\Data\sample_customer.csv',index_col=[0])
+df_sample_product = pd.read_csv(r'C:\Users\ZihaoYan\Downloads\API_Deploy\Data\sample_product.csv',index_col=[0])
+df_sample_tlog = pd.read_csv(r'C:\Users\ZihaoYan\Downloads\API_Deploy\Data\sample_tlog.csv',index_col=[0])
 
 # combined three datasets
 df_combined = df_sample_tlog.merge(df_sample_customer, on='customer_id', how='inner').merge(df_sample_product, on='upc_no', how='inner')
@@ -23,9 +23,7 @@ df_combined['price_dim_seg'] = le.fit_transform(df_combined['price_dim_seg'])
 df_combined.dropna(inplace=True)
 
 # select variables
-X = df_combined[['purchase_unit', 'sales_amt', 'disc_amt', 
-            'convenience_dim_seg', 'quality_dim_seg', 'health_dim_seg', 'price_dim_seg',
-            'convenience_dim_score', 'quality_dim_score', 'health_dim_score', 'price_dim_score']]
+X = df_combined[['purchase_unit', 'sales_amt']]
 y = df_combined['purchase_price']
 
 # train test split
@@ -37,3 +35,7 @@ regr = LinearRegression()
 # train the model
 regr.fit(X_train, y_train)
 print(regr.score(X_test, y_test))
+
+# saving the pipeline
+from joblib import dump
+dump(regr, 'regression_model.joblib')
