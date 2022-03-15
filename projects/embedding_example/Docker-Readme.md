@@ -6,7 +6,7 @@ a) Go to the app directory using `cd` in ***Anaconda prompt*** <br />
 b) Type this command `uvicorn main:app --reload` <br />
 c) Then open the link "http:localhost:port_no./docs" in your browser <br />
 d) On the top right, click on `Try it out` and try your parameters. <br /> <br />
-***Step 3:*** Install docker desktop and keep the app open during the entire process: <br /> <br />
+***Step 3:*** Install docker desktop and keep the app open during the entire process. <br /> <br />
 ***Step 4:*** You have Dockerfile inside the Docker process. It helps to: <br /> 
 a) Pulls the FastAPI docker image. <br />
 b) Copies the contents of the app directory to the image. <br />
