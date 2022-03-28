@@ -1,80 +1,95 @@
-import joblib
-import re
-from sklearn.neural_network import MLPClassifier
-from sklearn.feature_extraction.text import TfidfVectorizer
-from fastapi import FastAPI
-import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-import re
-from sklearn.cluster import KMeans
-from sklearn.cluster import MiniBatchKMeans
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.decomposition import PCA
-from sklearn.manifold import TSNE
-from scipy.spatial.distance import cdist
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-import nltk
-from sklearn.feature_extraction.text import CountVectorizer
-from nltk.stem import PorterStemmer
-from nltk.stem import WordNetLemmatizer
-from sklearn.preprocessing import normalize
-from wordcloud import WordCloud
-from datetime import datetime
-import random
-from tqdm import tqdm
-from gensim.models import Word2Vec
-
+import numpy as np
+import pickle
+from fastapi import FastAPI
+import os
 
 app = FastAPI()
+model = pickle.load(open('../model/model_22_03_28_11_41_52.pkl', "rb"))
+DOT = 'dot'
+COSINE = 'cosine'
+product = model["data"]["product"]
+customer = model["data"]["customer"]
+sales = model["data"]["sales"]
+embeddings = model["embeddings"]
 
+# helper function
+def compute_score(query_embedding, item_embeddings, measure = COSINE):
+    u = query_embedding
+    V = item_embeddings
+    if measure == COSINE:
+        u = u / np.linalg.norm(u)
+        V = V / np.linalg.norm(V, axis = 1, keepdims = True)
+    return u.dot(V.T)
+
+# api
 @app.get('/')
 def get_root():
-    return {'message': 'Welcome to the spam detection API'}
+    max_id = max(customer.customer_id_code.values)
+    return 'Welcome to the grocery recommendation API. There are %d customers to recommend products to. Find recommendations by their id ranging from 0 to %d.' % (max_id + 1, max_id)
 
-model = joblib.load('word2Vec.joblib')
-df = pd.read_csv("./test.csv")
-df["upc_desc"] = df["upc_desc"].apply(lambda x: x.strip(']['))
+@app.get("/get_customer_id/")
+async def get_customer_id():
+    return customer.customer_id_code.values
 
-def test_model(customer_id : int=190462787, topn :int=3):
-    print(customer_id)
-    words = list(model.wv.index_to_key)
-    df_cust = df[df["customer_id"] == customer_id]  ## for multiple customer , using .isin()
-    df_cust_prod = df_cust.groupby('customer_id')["upc_desc"].apply(list)
-    print(df_cust_prod[customer_id])
-    recommended_products = []
-    ## Can add another outer for loop for multiple customer recommendation
-    ## Finding the intersection of above 69 vocab products and the customer's bought products
-    most_common_bought_products = set(words).intersection(set(df_cust_prod[customer_id]))
-    for products in most_common_bought_products:
-        recommended_products.append(model.wv.most_similar(products, topn=topn))
+@app.get("/get_product_id/")
+async def get_product_id():
+    return product.upc_no_code.values
 
-    ## add 2 more conditions:
-    ## first make recommended products unique and convert it into a set
-    ## second check if recommended products already exists in df_cust_prod[customer_id])
-    return recommended_products
+@app.get("/customer_history/")
+async def customer_history(customer_id):
+    customer_id = int(customer_id)
+    products_purchased = list(sales[sales.customer_id == customer_id].upc_no.unique())
+    products_purchased_desc = product[product.apply(lambda x: x["upc_no_code"] in products_purchased, axis = 1)].upc_desc.unique()
+    return ", ".join(products_purchased_desc)
 
-@app.get('/')
-def get_root():
-    return {'message': 'Welcome to the grocery recommendation API'}
+@app.get("/recommend_products/")
+async def customer_recommendation(customer_id, measure = COSINE, k = 10, exclude_bought = False):
+    customer_id = int(customer_id)
+    k = int(k)
+    scores = compute_score(
+        embeddings["customer_id"][customer_id], 
+        embeddings["upc_no"], 
+        measure
+    )
+    score_key = measure + " score"
+    df = pd.DataFrame({
+        score_key: list(scores),
+        "product id": product["upc_no_code"],
+        "product name": product["upc_desc"],
+        "category": product["category_desc_level_1"],
+        "subcategory": product["category_desc_level_2"]
+    })
+    if exclude_bought:
+        bought_items = sales.query("customer_id == @customer_id")["upc_no"].unique()
+        df = df[df["product id"].apply(lambda x: x not in bought_items)]
+    output = ", ".join(df.sort_values([score_key], ascending = False).head(k)["product name"].values)
+    return output
 
-@app.get('/grocery_recommendation_query/')
-async def test_model(customer_id : int =190462787, topn : int=3):
-    print(customer_id)
-    words = list(model.wv.index_to_key)
-    df_cust = df[df["customer_id"] == customer_id]  ## for multiple customer , using .isin()
-    df_cust_prod = df_cust.groupby('customer_id')["upc_desc"].apply(list)
-    print(df_cust_prod[customer_id])
-    recommended_products = []
-    ## Can add another outer for loop for multiple customer recommendation
-    ## Finding the intersection of above 69 vocab products and the customer's bought products
-    most_common_bought_products = set(words).intersection(set(df_cust_prod[customer_id]))
-    for products in most_common_bought_products:
-        recommended_products.append(model.wv.most_similar(products, topn=topn))
+@app.get("/similar_products/")
+async def product_neighbors(desc, measure = COSINE, k = 10):
+    k = int(k)
 
-    ## add 2 more conditions:
-    ## first make recommended products unique and convert it into a set
-    ## second check if recommended products already exists in df_cust_prod[customer_id])
-    return recommended_products
+    ids = product[product["upc_desc"].str.contains(desc.upper())].index.values
+    descs = product.iloc[ids]["upc_desc"].values
+    
+    if len(descs) == 0:
+        raise ValueError("Found no products for %s" % desc)
+    print("Nearest neighbors of : %s." % descs[0])
+    
+    if len(descs) > 1:
+        print("Found more than 1 matching product. Other candidates: {}".format(", ".join(descs[1:])))
+
+    prod_id = ids[0]
+    scores = compute_score(
+        embeddings["upc_no"][prod_id], embeddings["upc_no"], measure
+    )
+    score_key = measure + " score"
+    df = pd.DataFrame({
+        score_key : list(scores),
+        "product name": product["upc_desc"],
+        "category": product["category_desc_level_1"],
+        "subcategory": product["category_desc_level_2"]
+    })
+    output = ", ".join(df.sort_values([score_key], ascending = False).head(k)["product name"].values)
+    return output
