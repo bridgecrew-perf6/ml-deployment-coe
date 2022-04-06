@@ -1,6 +1,6 @@
 # Machine Learning Deployment CoE
 
-## What is it?
+## Background
 
 1. Deploy ML Models
 
@@ -38,23 +38,25 @@
 - [Resources](#resources)
 
 
-
 ## Why use it?
 
 
 
 ## How to use it?
 
+### Step 1: Build Model
 
+### Step 2: Deploy local API
 
-## Prerequisite Knowledge
+### Step 3: Deploy algorithm to Docker
+
+### Step 4: Deploy Docker to Cloud
 
 
 
 ## The Weekly Plan
 
 [ML Deployment and Ops COE Weekly Plan](https://app.smartsheet.com/sheets/2Pv8prh98qrCfgMQVj6GGFFxw4qjwJv6G6QCwfF1?view=gantt)
-
 
 
 ## Resources
