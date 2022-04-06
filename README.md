@@ -50,6 +50,19 @@
 
 ### Step 3: Deploy algorithm to Docker
 
+***Step 3a :*** Download the Docker process directory.  <br /><br />
+***Step 3b:*** Make sure your FASTAPI is working locally. <br /> <br />
+***Step 3c:*** Install docker desktop and keep the app open during the entire process. <br /> <br />
+***Step 3d:*** You have Dockerfile inside the Docker process. It helps to: <br /> 
+i) Pulls the FastAPI docker image. <br />
+ii) Copies the contents of the app directory to the image. <br />
+iii) Makes the app directory the working directory. <br />
+iv) Installs necessary dependencies such as Scikit-learn and Joblib. <br /> <br />
+***Step 3e:*** Go to the `Docker process` folder and type this command: `docker build -t myimage .` <br /> <br />
+***Step 3f:*** Type this command: `docker run -d --name mycontainer -p 80:80 myimage` <br /> <br />
+***Step 3g:*** Now open the Docker desktop app and open the `Containers/Apps` tab, hover over the mycontainer 
+and click on `Open in new browser` tab.  
+
 ### Step 4: Deploy Docker to Cloud
 
 
