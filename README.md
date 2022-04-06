@@ -47,6 +47,7 @@
 ### Step 1: Build Model
 
 ### Step 2: Deploy local API
+[Local API Deploy](https://github.com/yuelong12/ml-deployment-coe/blob/development/projects/embedding_example/api_deployment/Local_API_Deploy.md)
 
 ### Step 3: Deploy algorithm to Docker
 

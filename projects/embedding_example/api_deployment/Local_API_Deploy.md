@@ -1,5 +1,9 @@
 # Deploy Machine Learning Models with FastAPI
-To give you a whole picture of developing an algorithm with API, first you need to train a model with your own dataset and store your final model into a file. Then, create a local webpage with the developed model file integrated in that page. Type any value to fit properly into the model, for example, if you developed a text classification model, you should type in text. Then the webpage(integrated with model) will return the preprocessed text result for you. If you developed a score rating model, you should type in the necessary feature value regarding to the model. Then the webpage will return the score rating result for you. 
+To give you a whole picture of developing an algorithm with API:
+
+* Train a model with your own dataset and store your final model into a file. 
+* Next, create a local webpage with the developed model file integrated in that page. Type any value to fit properly into the model, for example, if you developed a text classification model, you should type in text. 
+* Then the webpage(integrated with model) will return the preprocessed value result for you. If you developed a score rating model, you should type in the necessary feature value regarding to the model. Then the webpage will return the score rating result for you. 
 
 ## 1. Develop you algorithm
 This it the example algorithm, you can use any algorithm you want.
@@ -50,15 +54,15 @@ This it the example algorithm, you can use any algorithm you want.
 **NOTE**: you need to store this code into py file instead of ipynb. We need to execute it using terminal and generating a model file afterwards.
 
 ## 2. Install necessary packages and execute the py file 
-In your terminal, install joblib, fastapi packages. 'joblib' is the library to help us export the model file. 'fastapi' is the package to build webpage API. Run the following command in your terminal:
+In your terminal, install fastapi packages. 'fastapi' is the package to build webpage API. Run the following command in your terminal:
 
-    pip install joblib, fastapi
+    pip install fastapi
 
-execute your model.py file first to create a joblib model file. 
+execute your model.py file first to create a pickle model file. 
     
     py model.py
 
-There should be one 'regression_model.joblib' appears in your root folder. This is the backbone model that we use in the API.
+There should be one pkl file appears in your root folder. This is the backbone model that we use in the API.
 
 Next we need to build another py file. This is the execution file that API use. I attached my code for your reference:
 
@@ -95,7 +99,7 @@ Next we need to build another py file. This is the execution file that API use. 
 
         return score
 
-**NOTE:** You need to develop your own funtions to preprocess your input and make predictions afterward
+**NOTE:** You need to develop your own funtions to preprocess your input and make predictions afterward. This [website](https://fastapi.tiangolo.com/tutorial/first-steps/) include the reference to develop the FastAPI.
 
 ## 3. Run the command to execute the main code
     uvicorn main:app --reload
@@ -118,5 +122,3 @@ After type the input number in my case, my input_unit=1, input_amt=2, the api di
 ![api_result](https://github.com/yuelong12/ml-deployment-coe/blob/development/projects/embedding_example/api_deployment/Images/api_result.png?raw=true)
 
 You can see the model result under the Code - Response Body block. This should be the same when you run the same input in your jupyter notebook. 
-
-## Deploying the App on Docker
