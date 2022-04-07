@@ -1,6 +1,12 @@
-# Machine Learning Deployment CoE
+# [Machine Learning Deployment CoE](https://ml-deployment-coe.readthedocs.io/en/latest/index.html)
 
-## Background
+## Table of Contents
+
+- [What is it](#what-is-it)
+- [How to use it](#how-to-use-it)
+- [Resources](#resources)
+
+## What is it
 
 1. Deploy ML Models
 
@@ -28,24 +34,19 @@
       * Model Remediation
       * Model Fairness
 
-## Table of Contents
-
-- [What is it](#what-is-it)
-- [Why use it](#why-use-it)
-- [How to use it](#how-to-use-it)
-- [Prerequisite Knowledge](#prerequisite-knowledge)
-- [The Weekly Plan](#the-weekly-plan)
-- [Resources](#resources)
-
-
-## Why use it?
-
-
-
 ## How to use it?
 
-### Step 1: Build Model
+  You can follow the example project that we created under the projects/ folder to deploy your model to the cloud. 
 
+### Step 1: Build Model
+  In our example, we developed a recommendation algorithm using tensorflow saved in the algorithm/ folder. 
+  - The data that we used are customer transaction data saved in data/ folder. 
+    - There are 2938 products and 1243 customers in the dataset. 
+  - We developed the algorithm using the outcome 1 or 0 based on past if customer has made a purchase or not. 
+  - 
+  After we created the model, we pickled the embeddings learned in the process and saved it in the model/ folder. 
+  Next we created a main.py file that contains the API to be used later. 
+  We can test the APIs locally by following the steps in step 2. 
 ### Step 2: Deploy local API
 
 ### Step 3: Deploy algorithm to Docker
@@ -53,13 +54,5 @@
 ### Step 4: Deploy Docker to Cloud
 
 
-
-## The Weekly Plan
-
-[ML Deployment and Ops COE Weekly Plan](https://app.smartsheet.com/sheets/2Pv8prh98qrCfgMQVj6GGFFxw4qjwJv6G6QCwfF1?view=gantt)
-
-
 ## Resources
-
-[ML Development and Ops CoE Website](https://ml-deployment-coe.readthedocs.io/en/latest/index.html)
 
