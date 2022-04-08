@@ -7,62 +7,85 @@
 - [Resources](#resources)
 
 ## What is it
-
-1. Deploy ML Models
-
-   * Building and automating ML pipelines
-     * MLOps
-     * Airflow DAG
-     * Cloud Services(AWS/GCP/Azure)
-     * AutoML on the Cloud
-   * Dynamic deploying models
-     * Streamlit
-     * RESTAPI
-     * Docker
-     * Web Services
-     * Architecture
-
-   2. Iterate, Monitor, Optimize, and Maintain the model performance
-      * Revalidate Model Accuracy
-      * Bayesian A/B test
-      * Model Decay Detection
-      * Clickstream Data
-      * Digital Measurement
-      * Sensitivity Analysis
-      * Adversarial Attacks
-      * Residual Analysis
-      * Model Remediation
-      * Model Fairness
+This is the github repository where we develop examples to deploy different types of machine learning models to cloud. 
 
 ## How to use it?
 
-  You can follow the example project that we created under the projects/ folder to deploy your model to the cloud. 
+  You can use an example project that we created under [projects/](https://github.com/yuelong12/ml-deployment-coe/blob/development/projects/) and follow the steps that we described below to deploy your model. 
 
 ### Step 1: Build Model
-  In our example, we developed a recommendation algorithm using tensorflow saved in the algorithm/ folder. 
-  - The data that we used are customer transaction data saved in data/ folder. 
-    - There are 2938 products and 1243 customers in the dataset. 
-  - We developed the algorithm using the outcome 1 or 0 based on past if customer has made a purchase or not. 
-  - 
-  After we created the model, we pickled the embeddings learned in the process and saved it in the model/ folder. 
-  Next we created a main.py file that contains the API to be used later. 
-  We can test the APIs locally by following the steps in step 2. 
-### Step 2: Deploy local API
-[Local API Deploy](https://github.com/yuelong12/ml-deployment-coe/blob/development/projects/embedding_example/api_deployment/Local_API_Deploy.md)
+  - In the first example project, we developed a recommender system to suggest products to customers. 
+  
+  !(Algorithm folder)[https://github.com/yuelong12/ml-deployment-coe/blob/development/tutorials/images/algorithm_folder.png?raw=true]
+  
+  - In the end of ``model.ipynb`` file, we pickled the model and saved it in the model/ folder:
+  
+  ```python
+  from datetime import datetime
+  import pickle
+  model_timestamp = datetime.strftime(datetime.now(), "%y_%m_%d_%H_%M_%S")
+  export = dict()
+  export["data"] = {"product": product, "customer": customer, "sales": sales}
+  export["embeddings"] = model.embeddings
+  pickle.dump(export, open("../model/model_" + model_timestamp + ".pkl", "wb"))
+  ```
 
-### Step 3: Deploy algorithm to Docker
+  - Next we need to create the ``main.py`` file which contains the APIs to deploy. For example, to develop the API to recommend products to customers, we
+  give a name to the API (``recommend_products``) and write a function (``customer_recommendation``) that will return the output for that call. 
 
-***Step 3a :*** Download the Docker process directory.  <br /><br />
-***Step 3b:*** Make sure your FASTAPI is working locally. <br /> <br />
-***Step 3c:*** Install docker desktop and keep the app open during the entire process. <br /> <br />
-***Step 3d:*** You have Dockerfile inside the Docker process. It helps to: <br /> 
-i) Pulls the FastAPI docker image. <br />
-ii) Copies the contents of the app directory to the image. <br />
-iii) Makes the app directory the working directory. <br />
-iv) Installs necessary dependencies such as Scikit-learn and Joblib. <br /> <br />
-***Step 3e:*** Go to the `Docker process` folder and type this command: `docker build -t myimage .` <br /> <br />
-***Step 3f:*** Type this command: `docker run -d --name mycontainer -p 80:80 myimage` <br /> <br />
-***Step 3g:*** Now open the Docker desktop app and open the `Containers/Apps` tab, hover over the mycontainer 
+  ```python
+  @app.get("/recommend_products/")
+  async def customer_recommendation(customer_id, measure = COSINE, k = 10, exclude_bought = False):
+    customer_id = int(customer_id)
+    k = int(k)
+    scores = compute_score(
+        embeddings["customer_id"][customer_id], 
+        embeddings["upc_no"], 
+        measure
+    )
+    score_key = measure + " score"
+    df = pd.DataFrame({
+        score_key: list(scores),
+        "product id": product["upc_no_code"],
+        "product name": product["upc_desc"],
+        "category": product["category_desc_level_1"],
+        "subcategory": product["category_desc_level_2"]
+    })
+    if exclude_bought:
+        bought_items = sales.query("customer_id == @customer_id")["upc_no"].unique()
+        df = df[df["product id"].apply(lambda x: x not in bought_items)]
+    output = ", ".join(df.sort_values([score_key], ascending = False).head(k)["product name"].values)
+    return output
+  ``` 
+  - Save a copy of `main.py` and `model.pkl` in ``docker/app/`` folder to be used later in Step 3.  
+  - Next we can test the APIs locally by following the steps in Step 2. 
+
+### Step 2: [Test local API](https://github.com/yuelong12/ml-deployment-coe/blob/development/tutorials/local_api_deploy.md)
+
+- Go to ``docker/app/`` where we save both the pickled model and the APIs in `main.py`, [launch](https://github.com/yuelong12/ml-deployment-coe/blob/development/tutorials/local_api_deploy.md) a local Uviron server after installing fastapi. 
+
+- Go to http://127.0.0.1:8000/docs to see all the APIs available. 
+
+- Test your APIs by following the detailed steps in the [link](https://github.com/yuelong12/ml-deployment-coe/blob/development/tutorials/local_api_deploy.md). 
+
+### Step 3: [Deploy algorithm to Docker](https://github.com/yuelong12/ml-deployment-coe/blob/development/tutorials/docker_deploy.md)
+- Download the Docker process directory.
+
+- Make sure your FASTAPI is working locally by following **Step 2** above.
+
+- Install docker desktop and keep the app open during the entire process.
+
+- You have Dockerfile inside the `docker/` folder. It helps to:
+  - Pulls the FastAPI docker image.
+  - Copies the contents of the app directory to the image.
+  - Makes the app directory the working directory.
+  - Installs necessary dependencies.
+
+- Go to the `docker/` folder and type this command: `docker build -t myimage .`
+
+- Type this command: `docker run -d --name mycontainer -p 80:80 myimage`
+
+- Now open the Docker desktop app and open the `Containers/Apps` tab, hover over the mycontainer 
 and click on `Open in new browser` tab.  
 
 ### Step 4: Deploy Docker to Cloud
