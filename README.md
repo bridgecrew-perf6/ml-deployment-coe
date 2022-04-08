@@ -16,9 +16,9 @@ This is the github repository where we develop examples to deploy different type
 ### Step 1: Build Model
   - In the first example project, we developed a recommender system to suggest products to customers. 
   
-  !(Algorithm folder)[https://github.com/yuelong12/ml-deployment-coe/blob/development/tutorials/images/algorithm_folder.png?raw=true]
+  ![Algorithm folder](https://github.com/yuelong12/ml-deployment-coe/blob/development/tutorials/images/algorithm_folder.png?raw=true)
   
-  - In the end of ``model.ipynb`` file, we pickled the model and saved it in the model/ folder:
+  - In the end of ``model.ipynb`` (or you can use ``.py``) file, we pickled the model and saved it in the model/ folder:
   
   ```python
   from datetime import datetime
@@ -60,13 +60,13 @@ This is the github repository where we develop examples to deploy different type
   - Save a copy of `main.py` and `model.pkl` in ``docker/app/`` folder to be used later in Step 3.  
   - Next we can test the APIs locally by following the steps in Step 2. 
 
-### Step 2: [Test local API](https://github.com/yuelong12/ml-deployment-coe/blob/development/tutorials/local_api_deploy.md)
+### Step 2: [Test local API](https://github.com/yuelong12/ml-deployment-coe/blob/development/tutorials/test_api.md)
 
-- Go to ``docker/app/`` where we save both the pickled model and the APIs in `main.py`, [launch](https://github.com/yuelong12/ml-deployment-coe/blob/development/tutorials/local_api_deploy.md) a local Uviron server after installing fastapi. 
+- Go to ``docker/app/`` where we save both the pickled model and the APIs in `main.py`, [launch](https://github.com/yuelong12/ml-deployment-coe/blob/development/tutorials/test_api.md) a local Uviron server after installing fastapi. 
 
 - Go to http://127.0.0.1:8000/docs to see all the APIs available. 
 
-- Test your APIs by following the detailed steps in the [link](https://github.com/yuelong12/ml-deployment-coe/blob/development/tutorials/local_api_deploy.md). 
+- Test your APIs by following the detailed steps in the [link](https://github.com/yuelong12/ml-deployment-coe/blob/development/tutorials/test_api.md). 
 
 ### Step 3: [Deploy algorithm to Docker](https://github.com/yuelong12/ml-deployment-coe/blob/development/tutorials/docker_deploy.md)
 - Download the Docker process directory.
